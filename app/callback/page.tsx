@@ -7,7 +7,7 @@ export default async function CallbackPage() {
 
   if (!(await isAuthenticated())) {
     return redirect(
-      "/api/auth/login?post_login_redirect_url=http://localhost:3000/callback"
+      `/api/auth/login?post_login_redirect_url=${process.env.KINDE_SITE_URL}/callback`
     );
   }
 
@@ -15,7 +15,7 @@ export default async function CallbackPage() {
 
   if (!user) {
     return redirect(
-      "/api/auth/login?post_login_redirect_url=http://localhost:3000/callback"
+      `/api/auth/login?post_login_redirect_url=${process.env.KINDE_SITE_URL}/callback`
     );
   }
 
