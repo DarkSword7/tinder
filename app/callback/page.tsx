@@ -1,7 +1,8 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
+import { createUser, getUserByID } from "../neo4j.action";
 
-export default async function Home() {
+export default async function CallbackPage() {
   const { isAuthenticated, getUser } = getKindeServerSession();
 
   if (!(await isAuthenticated())) {
@@ -17,10 +18,19 @@ export default async function Home() {
       "/api/auth/login?post_login_redirect_url=http://localhost:3000/callback"
     );
   }
-  return (
-    <main>
-      <h1>Hello {user.given_name}</h1>
-      <p>Here is your email: {user.email}</p>
-    </main>
-  );
+
+  //Check if the user is already in the neo4j database
+  const dbUser = await getUserByID(user.id);
+
+  //If the user is not in the database, add the user to the database
+  if (!dbUser) {
+    await createUser({
+      applicationId: user.id,
+      email: user.email!,
+      firstname: user.given_name!,
+      lastname: user.family_name ?? undefined,
+    });
+  }
+
+  redirect("/");
 }
